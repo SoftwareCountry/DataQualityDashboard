@@ -200,25 +200,25 @@ executeDqChecks <- function(connectionDetails,
   checkDescriptionsDf <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Check_Descriptions.csv", cdmVersion), 
                                             package = "DataQualityDashboard"), 
                                 stringsAsFactors = FALSE)
-  
-  
-if (tableCheckThresholdLoc == "default"){
-      tableChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Table_Level.csv", cdmVersion),
-                              package = "DataQualityDashboard"), 
-                              stringsAsFactors = FALSE, na.strings = c(" ",""))} else {tableChecks <- read.csv(tableCheckThresholdLoc, 
-                                                                                      stringsAsFactors = FALSE, na.strings = c(" ",""))}
-  
-if (fieldCheckThresholdLoc == "default"){ 
+
+
+  if (tableCheckThresholdLoc == "default") {
+    tableChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Table_Level.csv", cdmVersion),
+                                        package = "DataQualityDashboard"),
+                            stringsAsFactors = FALSE, na.strings = c(" ", "")) } else { tableChecks <- read.csv(tableCheckThresholdLoc,
+                                                                                                                stringsAsFactors = FALSE, na.strings = c(" ", "")) }
+
+  if (fieldCheckThresholdLoc == "default") {
     fieldChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Field_Level.csv", cdmVersion),
-                                      package = "DataQualityDashboard"), 
-                          stringsAsFactors = FALSE, na.strings = c(" ",""))} else {fieldChecks <- read.csv(fieldCheckThresholdLoc, 
-                                                                                   stringsAsFactors = FALSE, na.strings = c(" ",""))}
-  
-if (conceptCheckThresholdLoc == "default"){ 
-  conceptChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Concept_Level.csv", cdmVersion),
-                                      package = "DataQualityDashboard"), 
-                          stringsAsFactors = FALSE, na.strings = c(" ",""))} else {conceptChecks <- read.csv(conceptCheckThresholdLoc, 
-                                                                                     stringsAsFactors = FALSE, na.strings = c(" ",""))}
+                                        package = "DataQualityDashboard"),
+                            stringsAsFactors = FALSE, na.strings = c(" ", "")) } else { fieldChecks <- read.csv(fieldCheckThresholdLoc,
+                                                                                                                stringsAsFactors = FALSE, na.strings = c(" ", "")) }
+
+  if (conceptCheckThresholdLoc == "default") {
+    conceptChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Concept_Level.csv", cdmVersion),
+                                          package = "DataQualityDashboard"),
+                              stringsAsFactors = FALSE, na.strings = c(" ", "")) } else { conceptChecks <- read.csv(conceptCheckThresholdLoc,
+                                                                                                                    stringsAsFactors = FALSE, na.strings = c(" ", "")) }
   
   # ensure we use only checks that are intended to be run -----------------------------------------
   
@@ -321,7 +321,7 @@ if (conceptCheckThresholdLoc == "default"){
   
   ParallelLogger::unregisterLogger("DqDashboard")
   
-  return(allResults$CheckResults)
+  return(allResults)
 }
 
 .runCheck <- function(checkDescription, 
@@ -579,10 +579,12 @@ if (conceptCheckThresholdLoc == "default"){
                  Metadata = metadata, 
                  Overview = overview)
   
+  return(result)
+}
+
+resultToJson -> function(result) {
   resultJson <- jsonlite::toJSON(result)
   write(resultJson, file.path(outputFolder, sprintf("results_%s.json", cdmSourceName)))
-  
-  result
 }
 
 
