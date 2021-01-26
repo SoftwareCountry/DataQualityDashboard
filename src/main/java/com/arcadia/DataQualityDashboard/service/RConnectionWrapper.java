@@ -6,27 +6,19 @@ import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
-import org.rosuda.REngine.Rserve.RserveException;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import static java.lang.String.format;
 
-@Service
-public class RServerService {
+public class RConnectionWrapper {
 
     private RConnection rConnection;
 
-    public RServerService() throws RserveException {
+    public RConnectionWrapper() {
+        init();
     }
 
     @SneakyThrows
-    @PostConstruct
-    public void init() {
-        rConnection = new RConnection();
-
+    public void loadScripts() {
         String executionScriptCmd = "source('R/execution.R')";
         String rServerScriptCmd = "source('R/rServer.R')";
 
@@ -34,12 +26,8 @@ public class RServerService {
         rConnection.voidEval(rServerScriptCmd);
     }
 
-    @PreDestroy
-    public void destroy() {
-        rConnection.close();
-    };
-
-    public String dataQualityCheck(DbSettings dbSettings) throws REngineException, REXPMismatchException, RException {
+    @SneakyThrows({REXPMismatchException.class, REngineException.class})
+    public String checkDataQuality(DbSettings dbSettings) throws RException {
         String dqdCmd = format("dataQualityCheck(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\")",
                 dbSettings.getDbType(),
                 dbSettings.getServer(),
@@ -48,7 +36,6 @@ public class RServerService {
                 dbSettings.getUser(),
                 dbSettings.getPassword()
         );
-
         String runCmd = toTryCmd(dqdCmd);
 
         REXP runResponse = rConnection.parseAndEval(runCmd);
@@ -60,7 +47,29 @@ public class RServerService {
         return runResponse.asString();
     }
 
+    @SneakyThrows
+    public Integer getRServerPid() {
+        String cmd = "Sys.getpid()";
+        return rConnection.eval(cmd).asInteger();
+    }
+
+    @SneakyThrows
+    public void cancel(int pid) {
+        rConnection.eval("tools::pskill("+ pid + ")");
+        rConnection.eval("tools::pskill("+ pid + ", tools::SIGKILL)");
+        rConnection.close();
+    }
+
+    public void close() {
+        this.rConnection.close();
+    }
+
     private String toTryCmd(String cmd) {
         return "try(eval(" + cmd + "),silent=TRUE)";
+    }
+
+    @SneakyThrows
+    private void init() {
+        rConnection = new RConnection();
     }
 }

@@ -5,13 +5,9 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.rosuda.REngine.REXPMismatchException;
-import org.rosuda.REngine.REngineException;
-import org.rosuda.REngine.Rserve.RserveException;
 
-class RServerServiceTest {
-
-    private final RServerService rServerService = new RServerService();
+class RConnectionWrapperTest {
+    private RConnectionWrapper rConnectionWrapper;
 
     private final DbSettings dbSettings = new DbSettings(
             "sql server",
@@ -23,22 +19,21 @@ class RServerServiceTest {
             "builder1!"
     );
 
-    RServerServiceTest() throws RserveException {
-    }
-
+    @SneakyThrows
     @BeforeEach
     void setUp() {
-        rServerService.init();
+        rConnectionWrapper = new RConnectionWrapper();
+        rConnectionWrapper.loadScripts();
     }
 
     @AfterEach
     void tearDown() {
-        rServerService.destroy();
+        rConnectionWrapper.close();
     }
 
     @Test
-    void dataQualityCheck() throws REngineException, REXPMismatchException, RException {
-        String result = rServerService.dataQualityCheck(dbSettings);
+    void dataQualityCheck() throws RException {
+        String result = rConnectionWrapper.checkDataQuality(dbSettings);
         System.out.println(result);
     }
 }
