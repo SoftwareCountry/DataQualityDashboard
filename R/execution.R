@@ -158,8 +158,10 @@ executeDqChecks <- function(connectionDetails,
                             cdmVersion = "5.3.1",
                             tableCheckThresholdLoc = "default",
                             fieldCheckThresholdLoc = "default",
-                            conceptCheckThresholdLoc = "default") {
-  
+                            conceptCheckThresholdLoc = "default",
+                            messageSender = list(send <- function() {})) {
+
+  messageSender$send("Execution started")
   options(scipen = 999)
   outputFolder <- file.path(outputFolder, cdmSourceName)
   
@@ -186,8 +188,7 @@ executeDqChecks <- function(connectionDetails,
     appenders <- list(ParallelLogger::createFileAppender(layout = ParallelLogger::layoutParallel, 
                                                          fileName = file.path(outputFolder, logFileName)))    
   }
-  
-  
+
   logger <- ParallelLogger::createLogger(name = "DqDashboard",
                                          threshold = "INFO",
                                          appenders = appenders)
@@ -276,7 +277,9 @@ executeDqChecks <- function(connectionDetails,
                                               vocabDatabaseSchema,
                                               cohortDatabaseSchema,
                                               cohortDefinitionId,
-                                              outputFolder, sqlOnly)
+                                              outputFolder,
+                                              sqlOnly,
+                                              messageSender)
   ParallelLogger::stopCluster(cluster = cluster)
   
   if (numThreads == 1 & !sqlOnly) {
@@ -297,8 +300,10 @@ executeDqChecks <- function(connectionDetails,
                                     tableChecks = tableChecks, 
                                     fieldChecks = fieldChecks,
                                     conceptChecks = conceptChecks)
-    
-    ParallelLogger::logInfo("Execution Complete")  
+
+    message <- "Execution Completed"
+    messageSender$send(message)
+    ParallelLogger::logInfo(message)
   }
 
   
@@ -335,10 +340,13 @@ executeDqChecks <- function(connectionDetails,
                       cohortDatabaseSchema,
                       cohortDefinitionId,
                       outputFolder, 
-                      sqlOnly) {
+                      sqlOnly,
+                      messageSender) {
   
   library(magrittr)
-  ParallelLogger::logInfo(sprintf("Processing check description: %s", checkDescription$checkName))
+  message <- sprintf("Processing check description: %s", checkDescription$checkName)
+  messageSender$send(message)
+  ParallelLogger::logInfo(message)
   
   filterExpression <- sprintf("%sChecks %%>%% dplyr::filter(%s)",
                               tolower(checkDescription$checkLevel),
@@ -582,11 +590,13 @@ executeDqChecks <- function(connectionDetails,
   return(result)
 }
 
-resultToJson -> function(result) {
-  resultJson <- jsonlite::toJSON(result)
-  write(resultJson, file.path(outputFolder, sprintf("results_%s.json", cdmSourceName)))
+resultToJson <- function(result) {
+  return(jsonlite::toJSON(result))
 }
 
+writeJsonResultToFile <- function(resultJson, outputFolder, cdmSourceName) {
+  write(resultJson, file.path(outputFolder, sprintf("results_%s.json", cdmSourceName)))
+}
 
 #' Write JSON Results to SQL Table
 #' 

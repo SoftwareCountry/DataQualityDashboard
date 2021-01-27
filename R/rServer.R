@@ -1,5 +1,3 @@
-library("jsonlite")
-
 dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, password) {
   connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dataType, user, password, server, port, extraSettings = "")
 
@@ -31,6 +29,10 @@ dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, passw
   # which CDM tables to exclude? ------------------------------------
   tablesToExclude <- c()
 
+  messageSender <- createMessageSender("testId")
+
+  messageSender$connect()
+
   result <- executeDqChecks(connectionDetails = connectionDetails,
                             cdmDatabaseSchema = cdmDatabaseSchema,
                             resultsDatabaseSchema = resultsDatabaseSchema,
@@ -42,9 +44,14 @@ dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, passw
                             writeToTable = writeToTable,
                             checkLevels = checkLevels,
                             tablesToExclude = tablesToExclude,
-                            checkNames = checkNames)
+                            checkNames = checkNames,
+                            messageSender = messageSender)
+
+  messageSender$close()
 
   jsonResult <- resultToJson(result)
+
+  writeJsonResultToFile(jsonResult, outputFolder, cdmSourceName)
 
   return(jsonResult)
 }
