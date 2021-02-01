@@ -1,28 +1,42 @@
 package com.arcadia.DataQualityDashboard.controller;
 
+import com.arcadia.DataQualityDashboard.dto.CheckDataQualityResult;
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
 import com.arcadia.DataQualityDashboard.service.RException;
-import com.arcadia.DataQualityDashboard.service.CheckDataQualityService;
+import com.arcadia.DataQualityDashboard.service.TaskHandler;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class CheckDataQualityController {
 
-    private final CheckDataQualityService checkDataQualityService;
+    private final TaskHandler taskHandler;
 
-    @SneakyThrows
-    @GetMapping
-    public String dataQualityCheck(DbSettings dbSettings, String userId) {
+    @PostMapping("/{userId}")
+    public void dataQualityCheck(@RequestBody DbSettings dbSettings, @PathVariable String userId) {
         try {
-            return checkDataQualityService.checkDataQuality(dbSettings, userId);
+            this.taskHandler.createTask(dbSettings, userId);
         } catch (RException e) {
-            return e.getMessage();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
+    }
+
+    @GetMapping("/{userId}")
+    public CheckDataQualityResult getResult(@PathVariable String userId) {
+        try {
+            String taskResult = taskHandler.getTaskResult(userId);
+            return new CheckDataQualityResult(true, taskResult);
+        } catch (Exception e) {
+            return new CheckDataQualityResult(false, e.getMessage());
+        }
+    }
+
+    @GetMapping("/cancel/{userId}")
+    void cancel(@PathVariable String userId) {
+        taskHandler.cancelTask(userId);
     }
 }
