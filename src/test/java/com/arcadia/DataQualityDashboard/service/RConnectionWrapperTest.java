@@ -36,4 +36,9 @@ class RConnectionWrapperTest {
         String result = rConnectionWrapper.checkDataQuality(dbSettings);
         System.out.println(result);
     }
+
+    @Test
+    void loadScripts() {
+        // Loading in setUp method
+    }
 }

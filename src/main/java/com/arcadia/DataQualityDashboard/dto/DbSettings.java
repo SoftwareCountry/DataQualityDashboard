@@ -1,11 +1,9 @@
 package com.arcadia.DataQualityDashboard.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NonNull;
 
-@AllArgsConstructor
-@Getter
+@Data
 public class DbSettings {
 
     @NonNull

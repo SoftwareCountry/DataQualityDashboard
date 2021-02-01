@@ -8,7 +8,7 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class DataQualityCheckService {
+public class CheckDataQualityService {
 
     private final ConcurrentHashMap<String, Integer> tasks = new ConcurrentHashMap<>();
 

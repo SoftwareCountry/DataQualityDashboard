@@ -19,11 +19,13 @@ public class RConnectionWrapper {
 
     @SneakyThrows
     public void loadScripts() {
-        String executionScriptCmd = "source('R/execution.R')";
         String rServerScriptCmd = "source('R/rServer.R')";
+        String messageSenderScriptCmd = "source('R/messageSender.R')";
+        String executionScriptCmd = "source('R/execution.R')";
 
-        rConnection.voidEval(executionScriptCmd);
         rConnection.voidEval(rServerScriptCmd);
+        rConnection.voidEval(messageSenderScriptCmd);
+        rConnection.voidEval(executionScriptCmd);
     }
 
     @SneakyThrows({REXPMismatchException.class, REngineException.class})
