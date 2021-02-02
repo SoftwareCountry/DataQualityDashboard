@@ -1,36 +1,32 @@
 library(websocket)
 
-# Wait up to 3 seconds for websocket connection to be open.
-pollUntilConnected <- function(ws, timeout = 3) {
-  connected <- FALSE
-  end <- Sys.time() + timeout
-  while (!connected && Sys.time() < end) {
-    # Need to run the event loop for websocket to complete connection.
-    later::run_now(1)
-
-    ready_state <- ws$readyState()
-    if (ready_state == 0L) {
-      # 0 means we're still trying to connect.
-      # For debugging, indicate how many times we've done this.
-      cat(".")
-    } else if (ready_state == 1L) {
-      connected <- TRUE
-    } else {
-      break
-    }
-  }
-
-  if (!connected) {
-    stop("Unable to establish websocket connection.")
-  }
-}
-
-parseMessage <- function(message, userId) {
-  parsedMessage <- sprintf("{ \"userId\": \"%s\", \"payload\": \"%s\" }", userId, message)
-  return(parsedMessage)
-}
-
 createMessageSender <- function(userId) {
+  result <- NULL
+
+  if (is.null(userId) || all(userId == "")) {
+    result <- createDefaultMessageSender()
+  } else {
+    result <- createWsMessageSender(userId)
+  }
+
+  return(result)
+}
+
+createDefaultMessageSender <- function() {
+  connect <- function() { }
+
+  send <- function(message) { }
+
+  close <- function() { }
+
+  result <- list(
+    connect = connect,
+    send = send,
+    close = close
+  )
+}
+
+createWsMessageSender <- function(userId) {
   ws <- WebSocket$new("ws://localhost:8080/progress", autoConnect = FALSE)
 
   ws$onOpen(function(event) {
@@ -67,4 +63,34 @@ createMessageSender <- function(userId) {
   )
 
   return(result)
+}
+
+# Wait up to 3 seconds for websocket connection to be open.
+pollUntilConnected <- function(ws, timeout = 3) {
+  connected <- FALSE
+  end <- Sys.time() + timeout
+  while (!connected && Sys.time() < end) {
+    # Need to run the event loop for websocket to complete connection.
+    later::run_now(1)
+
+    ready_state <- ws$readyState()
+    if (ready_state == 0L) {
+      # 0 means we're still trying to connect.
+      # For debugging, indicate how many times we've done this.
+      cat(".")
+    } else if (ready_state == 1L) {
+      connected <- TRUE
+    } else {
+      break
+    }
+  }
+
+  if (!connected) {
+    stop("Unable to establish websocket connection.")
+  }
+}
+
+parseMessage <- function(message, userId) {
+  parsedMessage <- sprintf("{ \"userId\": \"%s\", \"payload\": \"%s\" }", userId, message)
+  return(parsedMessage)
 }

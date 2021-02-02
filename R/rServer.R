@@ -1,4 +1,4 @@
-dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, password) {
+dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, password, wsUserId) {
   connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dataType, user, password, server, port, extraSettings = "")
 
   cdmDatabaseSchema <- dataBaseSchema # the fully qualified database schema name of the CDM
@@ -29,7 +29,7 @@ dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, passw
   # which CDM tables to exclude? ------------------------------------
   tablesToExclude <- c()
 
-  messageSender <- createMessageSender("testId")
+  messageSender <- createMessageSender(wsUserId)
 
   messageSender$connect()
 
