@@ -2,7 +2,6 @@ package com.arcadia.DataQualityDashboard.controller;
 
 import com.arcadia.DataQualityDashboard.dto.CheckDataQualityResult;
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
-import com.arcadia.DataQualityDashboard.service.RException;
 import com.arcadia.DataQualityDashboard.service.TaskHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
