@@ -1,4 +1,4 @@
-package com.arcadia.DataQualityDashboard.config;
+package com.arcadia.DataQualityDashboard.properties;
 
 import lombok.Getter;
 import lombok.Setter;

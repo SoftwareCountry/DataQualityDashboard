@@ -1,6 +1,7 @@
 package com.arcadia.DataQualityDashboard.service;
 
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
@@ -9,13 +10,10 @@ import org.rosuda.REngine.Rserve.RConnection;
 
 import static java.lang.String.format;
 
+@AllArgsConstructor
 public class RConnectionWrapper {
 
-    private RConnection rConnection;
-
-    public RConnectionWrapper() {
-        init();
-    }
+    private final RConnection rConnection;
 
     @SneakyThrows
     public void loadScripts() {
@@ -69,10 +67,5 @@ public class RConnectionWrapper {
 
     private String toTryCmd(String cmd) {
         return "try(eval(" + cmd + "),silent=TRUE)";
-    }
-
-    @SneakyThrows
-    private void init() {
-        rConnection = new RConnection();
     }
 }

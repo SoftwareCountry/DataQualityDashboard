@@ -1,6 +1,6 @@
 package com.arcadia.DataQualityDashboard.service;
 
-import com.arcadia.DataQualityDashboard.config.StorageProperties;
+import com.arcadia.DataQualityDashboard.properties.StorageProperties;
 import lombok.SneakyThrows;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

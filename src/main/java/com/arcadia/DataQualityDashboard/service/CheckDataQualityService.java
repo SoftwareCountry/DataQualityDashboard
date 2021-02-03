@@ -2,22 +2,16 @@ package com.arcadia.DataQualityDashboard.service;
 
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
 import com.arcadia.DataQualityDashboard.dto.ProgressNotificationStatus;
-import com.arcadia.DataQualityDashboard.service.message.MessageSender;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.SystemUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -29,20 +23,24 @@ public class CheckDataQualityService {
 
     private final WebSocketHandler webSocketHandler;
 
+    private final RConnectionCreator rConnectionCreator;
+
     private final ConcurrentHashMap<String, Integer> processes = new ConcurrentHashMap<>();
 
     @SneakyThrows
     @PostConstruct
     public void init() {
-        RConnectionWrapper rConnection = new RConnectionWrapper();
-        rConnection.loadScripts();
-        rConnection.close();
+        if (SystemUtils.IS_OS_UNIX) {
+            RConnectionWrapper rConnection = rConnectionCreator.createRConnection();
+            rConnection.loadScripts();
+            rConnection.close();
+        }
     }
 
     @SneakyThrows
     @Async
     public Future<String> checkDataQuality(DbSettings dbSettings, String userId) {
-        RConnectionWrapper rConnection = new RConnectionWrapper();
+        RConnectionWrapper rConnection = rConnectionCreator.createRConnection();
 
         Integer pid = rConnection.getRServerPid();
         processes.put(userId, pid);
@@ -65,7 +63,7 @@ public class CheckDataQualityService {
         Integer pid = processes.get(userId);
 
         if (pid != null) {
-            RConnectionWrapper rConnection = new RConnectionWrapper();
+            RConnectionWrapper rConnection = rConnectionCreator.createRConnection();
             rConnection.cancel(pid);
             rConnection.close();
         }
