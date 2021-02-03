@@ -3,12 +3,14 @@ package com.arcadia.DataQualityDashboard.service;
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.SystemUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 
 import static java.lang.String.format;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_UNIX;
 
 @AllArgsConstructor
 public class RConnectionWrapper {
@@ -61,8 +63,13 @@ public class RConnectionWrapper {
         rConnection.close();
     }
 
+    @SneakyThrows
     public void close() {
-        this.rConnection.close();
+        if (IS_OS_UNIX) {
+            this.rConnection.close();
+        } else {
+            this.rConnection.shutdown();
+        }
     }
 
     private String toTryCmd(String cmd) {

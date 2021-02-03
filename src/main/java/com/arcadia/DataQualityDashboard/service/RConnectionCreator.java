@@ -7,6 +7,8 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_UNIX;
+
 @Service
 public class RConnectionCreator {
 
@@ -36,7 +38,7 @@ public class RConnectionCreator {
     * a new Rserve connection on the corresponding port has to be established as well. */
     @SneakyThrows
     public RConnectionWrapper createRConnection() {
-        if (SystemUtils.IS_OS_UNIX) {
+        if (IS_OS_UNIX) {
             RConnection connection = new RConnection(host, port);
 
             return new RConnectionWrapper(connection);
