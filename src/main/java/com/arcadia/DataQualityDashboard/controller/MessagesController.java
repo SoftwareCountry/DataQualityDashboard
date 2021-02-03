@@ -5,7 +5,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class CheckDataQualityProgressController {
+public class MessagesController {
 
     @MessageMapping("/progress")
     public void handleMessage(@Payload String message) {

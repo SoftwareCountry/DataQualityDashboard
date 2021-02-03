@@ -11,11 +11,13 @@ public interface MessageSender {
 
     @SneakyThrows
     default void send(WebSocketSession session, String message){
-        ProgressNotification notification = new ProgressNotification(message, getStatus());
-        Gson gson = new Gson();
-        String json = gson.toJson(notification);
+        if (session != null) {
+            ProgressNotification notification = new ProgressNotification(message, getStatus());
+            Gson gson = new Gson();
+            String json = gson.toJson(notification);
 
-        session.sendMessage(new TextMessage(json));
+            session.sendMessage(new TextMessage(json));
+        }
     }
 
     ProgressNotificationStatus getStatus();

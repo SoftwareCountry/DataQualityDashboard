@@ -81,7 +81,7 @@
   tryCatch(
     expr = {
       if (singleThreaded) {
-        if (.needsAutoCommit(connection)) {
+        if (.needsAutoCommit(connection, connectionDetails)) {
           rJava::.jcall(connection@jConnection, "V", "setAutoCommit", TRUE)
         }  
       }
@@ -202,24 +202,32 @@ executeDqChecks <- function(connectionDetails,
                                             package = "DataQualityDashboard"), 
                                 stringsAsFactors = FALSE)
 
-
   if (tableCheckThresholdLoc == "default") {
     tableChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Table_Level.csv", cdmVersion),
                                         package = "DataQualityDashboard"),
-                            stringsAsFactors = FALSE, na.strings = c(" ", "")) } else { tableChecks <- read.csv(tableCheckThresholdLoc,
-                                                                                                                stringsAsFactors = FALSE, na.strings = c(" ", "")) }
+                            stringsAsFactors = FALSE, na.strings = c(" ", ""))
+  } else {
+    tableChecks <- read.csv(tableCheckThresholdLoc,
+                            stringsAsFactors = FALSE, na.strings = c(" ", ""))
+  }
 
   if (fieldCheckThresholdLoc == "default") {
     fieldChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Field_Level.csv", cdmVersion),
                                         package = "DataQualityDashboard"),
-                            stringsAsFactors = FALSE, na.strings = c(" ", "")) } else { fieldChecks <- read.csv(fieldCheckThresholdLoc,
-                                                                                                                stringsAsFactors = FALSE, na.strings = c(" ", "")) }
+                            stringsAsFactors = FALSE, na.strings = c(" ", ""))
+  } else {
+    fieldChecks <- read.csv(fieldCheckThresholdLoc,
+                            stringsAsFactors = FALSE, na.strings = c(" ", ""))
+  }
 
   if (conceptCheckThresholdLoc == "default") {
     conceptChecks <- read.csv(system.file("csv", sprintf("OMOP_CDMv%s_Concept_Level.csv", cdmVersion),
                                           package = "DataQualityDashboard"),
-                              stringsAsFactors = FALSE, na.strings = c(" ", "")) } else { conceptChecks <- read.csv(conceptCheckThresholdLoc,
-                                                                                                                    stringsAsFactors = FALSE, na.strings = c(" ", "")) }
+                              stringsAsFactors = FALSE, na.strings = c(" ", ""))
+  } else {
+    conceptChecks <- read.csv(conceptCheckThresholdLoc,
+                              stringsAsFactors = FALSE, na.strings = c(" ", ""))
+  }
   
   # ensure we use only checks that are intended to be run -----------------------------------------
   
@@ -687,7 +695,7 @@ writeJsonResultsToTable <- function(connectionDetails,
   )
 }
 
-.needsAutoCommit <- function(connection) {
+.needsAutoCommit <- function(connection, connectionDetails) {
   autoCommit <- FALSE
   if (!is.null(connection)) {
     if (inherits(connection, "DatabaseConnectorJdbcConnection")) {
