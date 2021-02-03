@@ -4,11 +4,11 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class ProgressMessage {
+public class ProgressNotification {
 
     @NonNull
-    private final String userId;
+    private final String message;
 
     @NonNull
-    private final String payload;
+    private final ProgressNotificationStatus status;
 }

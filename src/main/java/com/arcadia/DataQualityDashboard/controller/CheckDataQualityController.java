@@ -18,10 +18,10 @@ public class CheckDataQualityController {
 
     @PostMapping("/{userId}")
     public void dataQualityCheck(@RequestBody DbSettings dbSettings, @PathVariable String userId) {
-        try {
-            this.taskHandler.createTask(dbSettings, userId);
-        } catch (RException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        boolean result = this.taskHandler.createTask(dbSettings, userId);
+        if (!result) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Data Quality Check process already exist");
         }
     }
 

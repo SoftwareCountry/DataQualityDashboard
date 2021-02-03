@@ -8,5 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "storage")
 public class StorageProperties {
+
     private String location;
 }

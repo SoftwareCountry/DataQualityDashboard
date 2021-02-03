@@ -33,7 +33,7 @@ class RConnectionWrapperTest {
 
     @Test
     void dataQualityCheck() throws RException {
-        String result = rConnectionWrapper.checkDataQuality(dbSettings);
+        String result = rConnectionWrapper.checkDataQuality(dbSettings, "");
         System.out.println(result);
     }
 

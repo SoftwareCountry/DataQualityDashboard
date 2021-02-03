@@ -17,11 +17,12 @@ public class TaskHandler {
 
     private final Map<String, Future<String>> tasks = new ConcurrentHashMap<>();
 
-    public boolean createTask(DbSettings dbSettings, String userId) throws RException {
+    public boolean createTask(DbSettings dbSettings, String userId) {
         if (tasks.containsKey(userId)) {
             return false;
         }
         Future<String> newTask = checkDataQualityService.checkDataQuality(dbSettings, userId);
+
         tasks.put(userId, newTask);
 
         return true;

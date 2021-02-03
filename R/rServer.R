@@ -1,8 +1,16 @@
+library(DatabaseConnector)
+library(SqlRender)
+
 dataQualityCheck <- function(dataType, server, port, dataBaseSchema, user, password, wsUserId) {
-  connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dataType, user, password, server, port, extraSettings = "")
+  connectionDetails <- DatabaseConnector::createConnectionDetails(dbms = dataType,
+                                                                  user = user,
+                                                                  password = password,
+                                                                  server = server,
+                                                                  port = port,
+                                                                  extraSettings = "")
 
   cdmDatabaseSchema <- dataBaseSchema # the fully qualified database schema name of the CDM
-  resultsDatabaseSchema <- dataBaseSchema # the fully qualified database schema name of the results schema (that you can write to)
+  resultsDatabaseSchema <- "" # the fully qualified database schema name of the results schema (that you can write to)
   cdmSourceName <- "" # a human readable name for your CDM source
 
   # determine how many threads (concurrent SQL sessions) to use ----------------------------------------

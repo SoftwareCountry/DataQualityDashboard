@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.FileNotFoundException;
@@ -17,7 +14,8 @@ import static java.lang.String.format;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 
 @AllArgsConstructor
-@RestController("/api")
+@RestController
+@RequestMapping("/api")
 public class FileController {
 
     private final StorageService storageService;

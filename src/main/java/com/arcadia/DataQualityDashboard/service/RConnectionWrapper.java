@@ -29,14 +29,15 @@ public class RConnectionWrapper {
     }
 
     @SneakyThrows({REXPMismatchException.class, REngineException.class})
-    public String checkDataQuality(DbSettings dbSettings) throws RException {
-        String dqdCmd = format("dataQualityCheck(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\")",
-                dbSettings.getDbType(),
+    public String checkDataQuality(DbSettings dbSettings, String userId) throws RException {
+        String dqdCmd = format("dataQualityCheck(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\")",
+                dbSettings.getDbType().toLowerCase(),
                 dbSettings.getServer(),
                 dbSettings.getPort(),
                 format("%s.%s", dbSettings.getDatabase(), dbSettings.getSchema()),
                 dbSettings.getUser(),
-                dbSettings.getPassword()
+                dbSettings.getPassword(),
+                userId
         );
         String runCmd = toTryCmd(dqdCmd);
 

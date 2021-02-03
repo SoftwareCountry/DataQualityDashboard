@@ -39,7 +39,7 @@ public class FileStorageService implements StorageService {
         writer.write(fileContent);
         writer.close();
 
-        return resolvedFileName;
+        return fileName;
     }
 
     @Override
