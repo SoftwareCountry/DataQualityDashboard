@@ -60,7 +60,8 @@ public class RConnectionWrapper {
     public void cancel(int pid) {
         rConnection.eval("tools::pskill("+ pid + ")");
         rConnection.eval("tools::pskill("+ pid + ", tools::SIGKILL)");
-        rConnection.close();
+
+        this.close();
     }
 
     @SneakyThrows
