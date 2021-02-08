@@ -2,7 +2,6 @@ package com.arcadia.DataQualityDashboard.service;
 
 import com.arcadia.DataQualityDashboard.properties.RServeProperties;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.SystemUtils;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,9 +32,9 @@ public class RConnectionCreator {
 
     /* Multithreading
     * Unix: no problem, one Rserve instance can serve multiple calls.
-    * Windows: Rserve can't create a separate process by forking the current process.
-    * --> create a new Rserve process for each thread (listening on a different port),
-    * a new Rserve connection on the corresponding port has to be established as well. */
+    * Windows: Rserve can't create a separate process by forking the current process;
+    * Create a new Rserve process for each thread (listening on a different port);
+    * A new Rserve connection on the corresponding port has to be established as well. */
     @SneakyThrows
     public RConnectionWrapper createRConnection() {
         if (IS_OS_UNIX) {
