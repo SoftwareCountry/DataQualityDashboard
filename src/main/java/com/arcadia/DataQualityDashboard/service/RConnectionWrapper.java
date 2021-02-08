@@ -3,14 +3,11 @@ package com.arcadia.DataQualityDashboard.service;
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.io.IOUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 
-import java.io.FileInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static com.arcadia.DataQualityDashboard.util.OperationSystem.isUnix;
@@ -30,11 +27,9 @@ public class RConnectionWrapper {
         );
 
         for (String path : scriptsPaths) {
-            FileInputStream stream = new FileInputStream(path);
-            String script = IOUtils.toString(stream, StandardCharsets.UTF_8);
-            stream.close();
-
-            REXP runResponse = rConnection.parseAndEval(toTryCmd(script));
+            REXP runResponse = rConnection.parseAndEval(toTryCmd(
+                    format("source('%s')", path)
+            ));
             if (runResponse.inherits("try-error")) {
                 throw new RException(runResponse.asString());
             }
