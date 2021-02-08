@@ -6,4 +6,4 @@ library(Rserve)
 # Defaults
 # host = 127.0.0.1
 # port = 6311
-Rserve()
+Rserve(args="--no-save")

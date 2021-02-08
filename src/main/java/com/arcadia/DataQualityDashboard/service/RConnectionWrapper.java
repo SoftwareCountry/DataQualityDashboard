@@ -3,14 +3,18 @@ package com.arcadia.DataQualityDashboard.service;
 import com.arcadia.DataQualityDashboard.dto.DbSettings;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.io.IOUtils;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import static com.arcadia.DataQualityDashboard.util.OperationSystem.isUnix;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_UNIX;
 
 @AllArgsConstructor
 public class RConnectionWrapper {
@@ -19,13 +23,22 @@ public class RConnectionWrapper {
 
     @SneakyThrows
     public void loadScripts() {
-        String rServerScriptCmd = "source('R/rServer.R')";
-        String messageSenderScriptCmd = "source('R/messageSender.R')";
-        String executionScriptCmd = "source('R/execution.R')";
+        List<String> scriptsPaths = List.of(
+                "R/rServer.R",
+                "R/messageSender.R",
+                "R/execution.R"
+        );
 
-        rConnection.voidEval(rServerScriptCmd);
-        rConnection.voidEval(messageSenderScriptCmd);
-        rConnection.voidEval(executionScriptCmd);
+        for (String path : scriptsPaths) {
+            FileInputStream stream = new FileInputStream(path);
+            String script = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            stream.close();
+
+            REXP runResponse = rConnection.parseAndEval(toTryCmd(script));
+            if (runResponse.inherits("try-error")) {
+                throw new RException(runResponse.asString());
+            }
+        }
     }
 
     @SneakyThrows({REXPMismatchException.class, REngineException.class})
@@ -39,10 +52,8 @@ public class RConnectionWrapper {
                 dbSettings.getPassword(),
                 userId
         );
-        String runCmd = toTryCmd(dqdCmd);
 
-        REXP runResponse = rConnection.parseAndEval(runCmd);
-
+        REXP runResponse = rConnection.parseAndEval(toTryCmd(dqdCmd));
         if (runResponse.inherits("try-error")) {
             throw new RException(runResponse.asString());
         }
@@ -66,7 +77,7 @@ public class RConnectionWrapper {
 
     @SneakyThrows
     public void close() {
-        if (IS_OS_UNIX) {
+        if (isUnix()) {
             this.rConnection.close();
         } else {
             this.rConnection.shutdown();

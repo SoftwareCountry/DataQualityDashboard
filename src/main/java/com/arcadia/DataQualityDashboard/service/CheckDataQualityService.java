@@ -4,7 +4,6 @@ import com.arcadia.DataQualityDashboard.dto.DbSettings;
 import com.arcadia.DataQualityDashboard.dto.ProgressNotificationStatus;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.SystemUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
+import static com.arcadia.DataQualityDashboard.util.OperationSystem.isUnix;
 import static java.lang.String.format;
 
 @Service
@@ -30,7 +30,7 @@ public class CheckDataQualityService {
     @SneakyThrows
     @PostConstruct
     public void init() {
-        if (SystemUtils.IS_OS_UNIX) {
+        if (isUnix()) {
             RConnectionWrapper rConnection = rConnectionCreator.createRConnection();
             rConnection.loadScripts();
             rConnection.close();
