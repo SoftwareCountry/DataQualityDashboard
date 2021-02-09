@@ -1,30 +1,43 @@
 FROM r-base
 
-RUN apt-get update && apt-get install -y \
-	libcurl4-openssl-dev \
-	libssl-dev \
-	libcairo-dev \
-	default-jdk \
-	libxml2-dev
+RUN echo 'install.packages(c(\
+        "ParallelLogger", \
+        "SqlRender", \
+        "DatabaseConnector", \
+        "webscoket", \
+        "Rserve"), \
+        repos="https://cran.rstudio.com", \
+        dependencies=TRUE \
+    )' > /tmp/packages.R \
+    && Rscript /tmp/packages.R
 
-RUN R -e "install.packages('DatabaseConnector')"
-RUN R -e "install.packages('SqlRender')"
-RUN R -e "install.packages('ParallelLogger')"
-RUN R -e "install.packages('websocket')"
-RUN R -e "install.packages('devtools')"
-RUN R -e "devtools::install_github('OHDSI/DataQualityDashboard')"
-RUN R -e "install.packages('Rserve',, 'http://rforge.net/', type='source')"
+#RUN install2.r --error \
+#    -r "https://cran.rstudio.com" \
+#    devtools \
+#    Rserve && \
+#    Rscript -e "devtools::install_github('OHDSI/DataQualityDashboard')" && \
+#    rm -rf /tmp/downloaded_packages/ /tmp/*.rds
 
+#RUN install2.r --error \
+#    -r "https://cran.rstudio.com" \
+#    rJava \
+#    xml2 \
+#    rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+#
+#RUN install2.r --error \
+#    -r "https://cran.rstudio.com" \
+#    DatabaseConnectorJars \
+#    SqlRender \
+#    ParallelLogger \
+#    rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+#
+#RUN install2.r --error \
+#    -r "https://cran.rstudio.com" \
+#    DatabaseConnector \
+#    webscoket \
+#    Rserve && \
+#    rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+
+# Expose port 6311
 EXPOSE 6311
-
-VOLUME /rserve
-
-WORKDIR .
-
-RUN mkdir root/R
-
-COPY execution.R root/R/execution.R
-COPY messageSender.R root/R/messageSender.R
-COPY rServer.R root/R/rServer.R
-
 ENTRYPOINT R -e "Rserve::run.Rserve(remote=TRUE)"

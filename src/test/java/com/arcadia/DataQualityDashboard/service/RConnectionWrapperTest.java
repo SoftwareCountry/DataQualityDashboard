@@ -40,7 +40,7 @@ class RConnectionWrapperTest {
     }
 
     @Test
-    void dataQualityCheck() throws RException, DbTypeNotSupportedException {
+    void dataQualityCheck() throws RException {
         String result = rConnectionWrapper.checkDataQuality(dbSettings, "");
         System.out.println(result);
     }

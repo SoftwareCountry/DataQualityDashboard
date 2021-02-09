@@ -10,7 +10,6 @@ import org.rosuda.REngine.Rserve.RConnection;
 
 import java.util.List;
 
-import static com.arcadia.DataQualityDashboard.service.DbTypeAdapter.adaptDbType;
 import static com.arcadia.DataQualityDashboard.util.OperationSystem.isUnix;
 import static java.lang.String.format;
 
@@ -22,20 +21,25 @@ public class RConnectionWrapper {
     @SneakyThrows
     public void loadScripts() {
         List<String> scriptsPaths = List.of(
-                "~/R/rServer.R",
-                "~/R/messageSender.R",
-                "~/R/execution.R"
+                "R/rServer.R",
+                "R/messageSender.R",
+                "R/execution.R"
         );
 
         for (String path : scriptsPaths) {
-            rConnection.voidEval(format("source('%s')", path));
+            REXP runResponse = rConnection.parseAndEval(toTryCmd(
+                    format("source('%s')", path)
+            ));
+            if (runResponse.inherits("try-error")) {
+                throw new RException(runResponse.asString());
+            }
         }
     }
 
     @SneakyThrows({REXPMismatchException.class, REngineException.class})
-    public String checkDataQuality(DbSettings dbSettings, String userId) throws RException, DbTypeNotSupportedException {
+    public String checkDataQuality(DbSettings dbSettings, String userId) throws RException {
         String dqdCmd = format("dataQualityCheck(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\")",
-                adaptDbType(dbSettings.getDbType()),
+                dbSettings.getDbType().toLowerCase(),
                 dbSettings.getServer(),
                 dbSettings.getPort(),
                 format("%s.%s", dbSettings.getDatabase(), dbSettings.getSchema()),
