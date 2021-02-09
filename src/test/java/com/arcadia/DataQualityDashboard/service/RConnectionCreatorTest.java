@@ -1,7 +1,9 @@
 package com.arcadia.DataQualityDashboard.service;
 
 import com.arcadia.DataQualityDashboard.properties.RServeProperties;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.rosuda.REngine.Rserve.RConnection;
 
 class RConnectionCreatorTest {
 
