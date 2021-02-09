@@ -1,11 +1,11 @@
 FROM r-base
 
-RUN apt-get update && apt-get install -y \
-	libcurl4-openssl-dev \
-	libssl-dev \
-	libcairo-dev \
-	default-jdk \
-	libxml2-dev
+RUN apt-get update
+RUN apt-get install -y libcurl4-openssl-dev
+RUN apt-get install -y libssl-dev
+RUN apt-get install -y libcairo-dev
+RUN apt-get install -y default-jdk
+RUN apt-get install -y libxml2-dev
 
 RUN R -e "install.packages('DatabaseConnector')"
 RUN R -e "install.packages('SqlRender')"

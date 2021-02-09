@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd ./inst/shinyApps/www
 
 mkdir -p ../../../src/main/resources/static
