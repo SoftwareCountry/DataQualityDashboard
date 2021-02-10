@@ -2,9 +2,6 @@
 FROM openjdk:15-oracle as build
 WORKDIR /workspace/app
 
-# R scripts
-COPY R R
-
 # Source
 COPY src src
 COPY inst/shinyApps/www/ src/main/resources/static/
@@ -13,8 +10,6 @@ COPY inst/shinyApps/www/ src/main/resources/static/
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
-
-RUN ls -l
 
 RUN ./mvnw install
 

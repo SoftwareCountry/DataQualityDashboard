@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class RConnectionWrapperTest {
     private RConnectionWrapper rConnectionWrapper;
@@ -40,13 +41,13 @@ class RConnectionWrapperTest {
     }
 
     @Test
-    void dataQualityCheck() throws RException, DbTypeNotSupportedException {
-        String result = rConnectionWrapper.checkDataQuality(dbSettings, "");
-        System.out.println(result);
+    void loadScripts() {
+        // Loading in setUp method
     }
 
     @Test
-    void loadScripts() {
-        // Loading in setUp method
+    void dataQualityCheck() throws RException, DbTypeNotSupportedException {
+        String result = rConnectionWrapper.checkDataQuality(dbSettings, "");
+        assertNotNull(result);
     }
 }
