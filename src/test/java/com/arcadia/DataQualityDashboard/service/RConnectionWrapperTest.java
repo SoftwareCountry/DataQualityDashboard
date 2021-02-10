@@ -11,8 +11,8 @@ class RConnectionWrapperTest {
     private RConnectionWrapper rConnectionWrapper;
 
     private final RServeProperties properties = new RServeProperties(
-            "C:/Program Files/R/R-4.0.3/bin/x64/R.exe",
-            "127.0.0.1",
+            "",
+            "10.110.1.7",
             6311
     );
 

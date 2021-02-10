@@ -1,15 +1,13 @@
 package com.arcadia.DataQualityDashboard.service;
 
 import com.arcadia.DataQualityDashboard.properties.RServeProperties;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.rosuda.REngine.Rserve.RConnection;
 
 class RConnectionCreatorTest {
 
     private final RServeProperties properties = new RServeProperties(
-            "C:/Program Files/R/R-4.0.3/bin/x64/R.exe",
-            "127.0.0.1",
+            "",
+            "10.110.1.7",
             6311
     );
 
