@@ -20,13 +20,7 @@ public class RConnectionWrapper {
     private final RConnection rConnection;
 
     @SneakyThrows
-    public void loadScripts() {
-        List<String> scriptsPaths = List.of(
-                "~/R/rServer.R",
-                "~/R/messageSender.R",
-                "~/R/execution.R"
-        );
-
+    public void loadScripts(List<String> scriptsPaths) {
         for (String path : scriptsPaths) {
             rConnection.voidEval(format("source('%s')", path));
         }

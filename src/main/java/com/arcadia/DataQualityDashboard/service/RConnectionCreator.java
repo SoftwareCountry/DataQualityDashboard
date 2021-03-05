@@ -6,13 +6,15 @@ import org.rosuda.REngine.Rserve.RConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.arcadia.DataQualityDashboard.util.OperationSystem.isUnix;
 
 @Service
 public class RConnectionCreator {
 
     /* For Windows */
-    private final String path;
+    private final String exeFilePath;
 
     private final String host;
 
@@ -23,7 +25,7 @@ public class RConnectionCreator {
 
     @Autowired
     public RConnectionCreator(RServeProperties properties) {
-        path = properties.getPath();
+        exeFilePath = properties.getPath();
         host = properties.getHost();
         port = properties.getPort();
 
@@ -47,7 +49,11 @@ public class RConnectionCreator {
             RConnection connection = new RConnection(host, currentPort);
 
             RConnectionWrapper connectionWrapper = new RConnectionWrapper(connection);
-            connectionWrapper.loadScripts();
+            connectionWrapper.loadScripts(List.of(
+                    "R/rServer.R",
+                    "R/messageSender.R",
+                    "R/execution.R"
+            ));
 
             return connectionWrapper;
         }
@@ -55,7 +61,7 @@ public class RConnectionCreator {
 
     @SneakyThrows
     private void createRServeProcess(int port) {
-        String cmd = String.format("%s -e \"library(Rserve);Rserve(port=%d)\"", path, port);
+        String cmd = String.format("%s -e \"library(Rserve);Rserve(port=%d)\"", exeFilePath, port);
         Runtime.getRuntime().exec(cmd);
     }
 

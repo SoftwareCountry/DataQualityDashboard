@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
@@ -32,7 +33,11 @@ public class CheckDataQualityService {
     public void init() {
         if (isUnix()) {
             RConnectionWrapper rConnection = rConnectionCreator.createRConnection();
-            rConnection.loadScripts();
+            rConnection.loadScripts(List.of(
+                    "~/R/rServer.R",
+                    "~/R/messageSender.R",
+                    "~/R/execution.R"
+            ));
             rConnection.close();
         }
     }
