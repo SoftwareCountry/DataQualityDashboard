@@ -23,6 +23,17 @@ public class RConnectionCreator {
     /* For Windows */
     private volatile int currentPort;
 
+    private List<String> loadScripts = List.of(
+            "~/R/rServer.R",
+            "~/R/messageSender.R",
+            "~/R/execution.R"
+    );
+
+    public RConnectionCreator setLoadScripts(List<String> loadScripts) {
+        this.loadScripts = loadScripts;
+        return this;
+    }
+
     @Autowired
     public RConnectionCreator(RServeProperties properties) {
         exeFilePath = properties.getPath();
@@ -39,26 +50,22 @@ public class RConnectionCreator {
     * A new Rserve connection on the corresponding port has to be established as well. */
     @SneakyThrows
     public RConnectionWrapper createRConnection() {
-        if (isUnix()) {
-            RConnection connection = new RConnection(host, port);
+        RConnection connection;
 
-            return new RConnectionWrapper(connection);
+        if (isUnix()) {
+            connection = new RConnection(host, port);
         } else {
             int currentPort = getAndIncrementCurrentPort();
             createRServeProcess(currentPort);
-            RConnection connection = new RConnection(host, currentPort);
-
-            RConnectionWrapper connectionWrapper = new RConnectionWrapper(connection);
-            connectionWrapper.loadScripts(List.of(
-                    "R/rServer.R",
-                    "R/messageSender.R",
-                    "R/execution.R"
-            ));
-
-            return connectionWrapper;
+            connection = new RConnection(host, currentPort);
         }
+        RConnectionWrapper connectionWrapper = new RConnectionWrapper(connection);
+        connectionWrapper.loadScripts(loadScripts);
+
+        return connectionWrapper;
     }
 
+    /* For Windows */
     @SneakyThrows
     private void createRServeProcess(int port) {
         String cmd = String.format("%s -e \"library(Rserve);Rserve(port=%d)\"", exeFilePath, port);
