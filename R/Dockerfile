@@ -1,7 +1,6 @@
 FROM r-base
 
 ARG prop=default
-RUN echo ${prop}.properties
 
 RUN apt-get update
 RUN apt-get install -y apt-utils
@@ -25,8 +24,9 @@ VOLUME /rserve
 
 WORKDIR .
 
-RUN mkdir root/R
+RUN mkdir root/R/properties
 
+COPY properties/${prop}.properties root/R/properties/default.properties
 COPY execution.R root/R/execution.R
 COPY messageSender.R root/R/messageSender.R
 COPY rServer.R root/R/rServer.R
