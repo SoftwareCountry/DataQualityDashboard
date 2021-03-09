@@ -1,5 +1,8 @@
 FROM r-base
 
+ARG prop=default
+RUN echo ${prop}.properties
+
 RUN apt-get update
 RUN apt-get install -y apt-utils
 RUN apt-get install -y libcurl4-openssl-dev
@@ -12,6 +15,7 @@ RUN R -e "install.packages('SqlRender')"
 RUN R -e "install.packages('ParallelLogger')"
 RUN R -e "install.packages('websocket')"
 RUN R -e "install.packages('devtools')"
+RUN R -e "install.packages('properties')"
 RUN R -e "devtools::install_github('OHDSI/DataQualityDashboard')"
 RUN R -e "install.packages('Rserve',, 'http://rforge.net/', type='source')"
 
