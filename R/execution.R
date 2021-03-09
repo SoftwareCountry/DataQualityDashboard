@@ -58,9 +58,8 @@
   reportResult
 }
 
-.processCheck <- function(recordResult = .recordResult,
-                          connection,
-                          connectionDetails, 
+.processCheck <- function(connection,
+                          connectionDetails,
                           check, 
                           checkDescription, 
                           sql, 
@@ -91,7 +90,7 @@
                                             errorReportFile = errorReportFile)
       
       delta <- difftime(Sys.time(), start, units = "secs")
-      recordResult(result = result, check = check, checkDescription = checkDescription, sql = sql,
+      .recordResult(result = result, check = check, checkDescription = checkDescription, sql = sql,
                     executionTime = sprintf("%f %s", delta, attr(delta, "units")))
     },
     warning = function(w) {
@@ -100,7 +99,7 @@
                                       checkDescription$checkName, 
                                       check["cdmTableName"], 
                                       check["cdmFieldName"], w$message))
-      recordResult(check = check, checkDescription = checkDescription, sql = sql, warning = w$message)
+      .recordResult(check = check, checkDescription = checkDescription, sql = sql, warning = w$message)
     },
     error = function(e) {
       ParallelLogger::logError(sprintf("[Level: %s] [Check: %s] [CDM Table: %s] [CDM Field: %s] %s", 
@@ -108,7 +107,7 @@
                                        checkDescription$checkName, 
                                        check["cdmTableName"], 
                                        check["cdmFieldName"], e$message))
-      recordResult(check = check, checkDescription = checkDescription, sql = sql, error = e$message)
+      .recordResult(check = check, checkDescription = checkDescription, sql = sql, error = e$message)
     }
   ) 
 }
@@ -311,8 +310,6 @@ executeDqChecks <- function(connectionDetails,
   cluster <- ParallelLogger::makeCluster(numberOfThreads = numThreads, singleThreadToMain = TRUE)
   resultsList <- ParallelLogger::clusterApply(cluster = cluster, x = checkDescriptions,
                                               fun = .runCheck,
-                                              processCheck = .processCheck,
-                                              recordResult = .recordResult,
                                               tableChecks,
                                               fieldChecks,
                                               conceptChecks,
@@ -376,8 +373,6 @@ executeDqChecks <- function(connectionDetails,
 }
 
 .runCheck <- function(checkDescription,
-                      processCheck = .processCheck,
-                      recordResult = .recordResult,
                       tableChecks,
                       fieldChecks,
                       conceptChecks,
@@ -431,8 +426,7 @@ executeDqChecks <- function(connectionDetails,
                                         sprintf("%s.sql", checkDescription$checkName)), append = TRUE)
         data.frame()
       } else {
-        processCheck(recordResult,
-                     connection = connection,
+        .processCheck(connection = connection,
                      connectionDetails = connectionDetails,
                      check = check,
                      checkDescription = checkDescription,
