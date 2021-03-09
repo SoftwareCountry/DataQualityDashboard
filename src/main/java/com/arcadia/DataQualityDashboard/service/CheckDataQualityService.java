@@ -8,12 +8,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
-import static com.arcadia.DataQualityDashboard.util.OperationSystem.isUnix;
 import static java.lang.String.format;
 
 @Service
@@ -27,20 +24,6 @@ public class CheckDataQualityService {
     private final RConnectionCreator rConnectionCreator;
 
     private final ConcurrentHashMap<String, Integer> processes = new ConcurrentHashMap<>();
-
-    @SneakyThrows
-    @PostConstruct
-    public void init() {
-        if (isUnix()) {
-            RConnectionWrapper rConnection = rConnectionCreator.createRConnection();
-            rConnection.loadScripts(List.of(
-                    "~/R/rServer.R",
-                    "~/R/messageSender.R",
-                    "~/R/execution.R"
-            ));
-            rConnection.close();
-        }
-    }
 
     @Async
     public Future<String> checkDataQuality(DbSettings dbSettings, String userId) throws RException, DbTypeNotSupportedException {
