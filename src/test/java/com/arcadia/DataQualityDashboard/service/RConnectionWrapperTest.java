@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class RConnectionWrapperTest {
 
     @Test
-    void loadScripts() {
+    void loadScripts() throws RException {
         // Windows OS
         RConnectionWrapper connection = new RConnectionCreator(rServerProperties)
                 .setLoadScripts(loadScripts)

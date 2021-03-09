@@ -3,6 +3,7 @@ package com.arcadia.DataQualityDashboard.service;
 import com.arcadia.DataQualityDashboard.properties.RServeProperties;
 import lombok.SneakyThrows;
 import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,16 +49,19 @@ public class RConnectionCreator {
     * Windows: Rserve can't create a separate process by forking the current process;
     * Create a new Rserve process for each thread (listening on a different port);
     * A new Rserve connection on the corresponding port has to be established as well. */
-    @SneakyThrows
-    public RConnectionWrapper createRConnection() {
+    public RConnectionWrapper createRConnection() throws RException {
         RConnection connection;
 
-        if (isUnix()) {
-            connection = new RConnection(host, port);
-        } else {
-            int currentPort = getAndIncrementCurrentPort();
-            createRServeProcess(currentPort);
-            connection = new RConnection(host, currentPort);
+        try {
+            if (isUnix()) {
+                connection = new RConnection(host, port);
+            } else {
+                int currentPort = getAndIncrementCurrentPort();
+                createRServeProcess(currentPort);
+                connection = new RConnection(host, currentPort);
+            }
+        } catch (RserveException e) {
+            throw new RException(e.getMessage(), e);
         }
         RConnectionWrapper connectionWrapper = new RConnectionWrapper(connection);
         connectionWrapper.loadScripts(loadScripts);

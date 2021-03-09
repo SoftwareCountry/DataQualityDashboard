@@ -8,7 +8,7 @@ import static com.arcadia.DataQualityDashboard.service.TestProperties.rServerPro
 class RConnectionCreatorTest {
 
     @Test
-    void createMultipleRConnection() {
+    void createMultipleRConnection() throws RException {
         RConnectionCreator creator = new RConnectionCreator(rServerProperties)
                 .setLoadScripts(loadScripts);
 

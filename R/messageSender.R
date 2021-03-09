@@ -28,7 +28,7 @@ createDefaultMessageSender <- function() {
 }
 
 createWsMessageSender <- function(userId) {
-  props <- read.properties('properties/default.properties')
+  props <- read.properties('~/R/properties/default.properties')
   server <- props$host
   url <- paste(server, '/dqd/progress', collapse = '')
 
